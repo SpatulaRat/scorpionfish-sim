@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>Scorpionfish Evolution</title>
+  <title>Scorpionfish Evolution (By Howard Bush)</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     #key span {
@@ -184,7 +184,7 @@
 
       for (let i = 0; i < babies; i++) {
         newFish.push(createFish(
-          Math.random() < 0.002 ? !f.toxic : f.toxic // lower mutation
+          Math.random() < 0.01 ? !f.toxic : f.toxic // lower mutation
         ));
       }
     });
@@ -220,7 +220,7 @@
       fish.push(createFish(Math.random() < 0.1));
     }
 
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < random.random(3,7); i++) {
       predators.push(createPredator());
     }
 
