@@ -220,7 +220,7 @@
       fish.push(createFish(Math.random() < 0.1));
     }
 
-    for (let i = 0; i < random.random(3,7); i++) {
+    for (let i = 0; i < Math.floor(Math.random()*10) + 3; i++) {
       predators.push(createPredator());
     }
 
