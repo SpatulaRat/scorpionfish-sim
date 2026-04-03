@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html>
 <head>
   <title>Scorpionfish Evolution</title>
@@ -29,8 +30,7 @@
   <div><span style="background:black"></span> Predator</div>
 </div>
 
-<canvas id="tank" width="700" height="400"></canvas>
-<button id="startBtn">Start Simulation</button>
+<canvas id="tank" width="700" height="400"></canvas> <button id="startBtn">Start Simulation</button>
 
 <h2>Stats</h2>
 <p id="stats"></p>
@@ -43,8 +43,11 @@
     return {
       x: Math.random() * 700,
       y: Math.random() * 400,
-      vx: (Math.random() - 0.5) * 2,
-      vy: (Math.random() - 0.5) * 2,
+
+      // toxic fish are slower (cost of toxicity)
+      vx: (Math.random() - 0.5) * (isToxic ? 1.2 : 2),
+      vy: (Math.random() - 0.5) * (isToxic ? 1.2 : 2),
+
       toxic: isToxic,
       alive: true
     };
@@ -54,7 +57,8 @@
     return {
       x: Math.random() * 700,
       y: Math.random() * 400,
-      speed: 2
+      speed: 2,
+      avoidToxic: 0.9 // predators strongly avoid toxic fish
     };
   }
 
@@ -87,24 +91,48 @@
 
   // ===== Simulation Functions =====
   function moveFish(f) {
-    f.x += f.vx; f.y += f.vy;
+    f.x += f.vx; 
+    f.y += f.vy;
+
     if (f.x < 0 || f.x > 700) f.vx *= -1;
     if (f.y < 0 || f.y > 400) f.vy *= -1;
   }
 
   function movePredator(p) {
     let target = null, minDist = Infinity;
+
     fish.forEach(f => {
-      if (!f.alive || f.toxic) return;
-      let dx = f.x - p.x, dy = f.y - p.y, dist = Math.sqrt(dx*dx + dy*dy);
-      if (dist < minDist) { minDist = dist; target = f; }
+      if (!f.alive) return;
+
+      // predators usually avoid toxic fish, but sometimes take the risk
+      if (f.toxic && Math.random() < p.avoidToxic) return;
+
+      let dx = f.x - p.x;
+      let dy = f.y - p.y;
+      let dist = Math.sqrt(dx*dx + dy*dy);
+
+      if (dist < minDist) {
+        minDist = dist;
+        target = f;
+      }
     });
 
     if (target) {
-      let dx = target.x - p.x, dy = target.y - p.y, dist = Math.sqrt(dx*dx + dy*dy);
+      let dx = target.x - p.x;
+      let dy = target.y - p.y;
+      let dist = Math.sqrt(dx*dx + dy*dy);
+
       p.x += dx/dist * p.speed;
       p.y += dy/dist * p.speed;
-      if (dist < 10) target.alive = false;
+
+      if (dist < 10) {
+        target.alive = false;
+
+        // predator "learns" slightly to avoid toxic fish more
+        if (target.toxic) {
+          p.avoidToxic = Math.min(0.98, p.avoidToxic + 0.02);
+        }
+      }
     }
 
     // keep predators inside canvas
@@ -116,13 +144,16 @@
 
   function draw() {
     ctx.clearRect(0,0,700,400);
+
     fish.forEach(f => {
       if (!f.alive) return;
+
       ctx.fillStyle = f.toxic ? "red" : "blue";
       ctx.beginPath();
       ctx.arc(f.x, f.y, 5, 0, Math.PI*2);
       ctx.fill();
     });
+
     predators.forEach(p => {
       ctx.fillStyle = "black";
       ctx.beginPath();
@@ -134,9 +165,11 @@
   function updateGraph() {
     const alive = fish.filter(f => f.alive);
     const toxic = alive.filter(f => f.toxic).length / alive.length || 0;
+
     chart.data.labels.push(generation);
     chart.data.datasets[0].data.push(toxic);
     chart.update();
+
     document.getElementById("stats").innerText =
       `Generation: ${generation}\nPopulation: ${alive.length}\n% of Toxic Fish: ${(toxic*100).toFixed(1)}%`;
   }
@@ -144,23 +177,35 @@
   function reproduce() {
     const alive = fish.filter(f => f.alive);
     let newFish = [];
+
     alive.forEach(f => {
-      newFish.push(createFish(f.toxic));
-      newFish.push(createFish(Math.random() < 0.005 ? !f.toxic : f.toxic));
+      // toxic fish reproduce less (cost)
+      const babies = f.toxic ? 1 : 2;
+
+      for (let i = 0; i < babies; i++) {
+        newFish.push(createFish(
+          Math.random() < 0.002 ? !f.toxic : f.toxic // lower mutation
+        ));
+      }
     });
+
     fish = newFish.slice(0, 200);
   }
 
   function animate() {
     frame++;
+
     fish.forEach(moveFish);
     predators.forEach(movePredator);
+
     draw();
+
     if (frame % 180 === 0) {
       updateGraph();
       reproduce();
       generation++;
     }
+
     requestAnimationFrame(animate);
   }
 
@@ -169,8 +214,16 @@
     predators = [];
     generation = 0;
     frame = 0;
-    for (let i = 0; i < 50; i++) fish.push(createFish(Math.random() < 0.5));
-    for (let i = 0; i < 3; i++) predators.push(createPredator());
+
+    // start with low toxic percentage
+    for (let i = 0; i < 50; i++) {
+      fish.push(createFish(Math.random() < 0.1));
+    }
+
+    for (let i = 0; i < 3; i++) {
+      predators.push(createPredator());
+    }
+
     chart.data.labels = [];
     chart.data.datasets[0].data = [];
     chart.update();
