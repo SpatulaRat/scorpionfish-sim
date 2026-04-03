@@ -98,7 +98,7 @@ window.onload = function() {
             newFish.push(createFish(f.toxic));
             newFish.push(createFish(Math.random()<0.05? !f.toxic : f.toxic));
         });
-        fish=newFish.slice(0,50);
+        fish=newFish.slice(0,200);
     }
 
     function animate(){
@@ -106,7 +106,7 @@ window.onload = function() {
         fish.forEach(moveFish);
         predators.forEach(movePredator);
         draw();
-        if(frame%60===0){
+        if(frame%300===0){
             updateGraph();
             reproduce();
             generation++;
