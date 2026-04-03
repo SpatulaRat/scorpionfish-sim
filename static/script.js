@@ -88,7 +88,7 @@ window.onload = function() {
         chart.data.datasets[0].data.push(toxic);
         chart.update();
         document.getElementById("stats").innerText=
-            `Generation: ${generation}\nPopulation: ${alive.length}\n% Toxic: ${(toxic*100).toFixed(1)}%`;
+            `Generation: ${generation}\nPopulation: ${alive.length}\n% of Toxic Fish: ${(toxic*100).toFixed(1)}%`;
     }
 
     function reproduce(){
