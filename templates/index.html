@@ -146,7 +146,7 @@
     let newFish = [];
     alive.forEach(f => {
       newFish.push(createFish(f.toxic));
-      newFish.push(createFish(Math.random() < 0.005 ? !f.toxic : f.toxic));
+      newFish.push(createFish(Math.random() < 0.01 ? !f.toxic : f.toxic));
     });
     fish = newFish.slice(0, 200);
   }
