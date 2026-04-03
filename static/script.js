@@ -1,7 +1,9 @@
 let chart; // global chart variable
 
 window.onload = function() {
-
+    
+    document.querySelector('button').onclick = runSimulation;
+    
     const canvas = document.getElementById("tank");
     const ctx = canvas.getContext("2d");
 
