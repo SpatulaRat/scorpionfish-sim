@@ -106,7 +106,7 @@ window.onload = function() {
         fish.forEach(moveFish);
         predators.forEach(movePredator);
         draw();
-        if(frame%300===0){
+        if(frame%180===0){
             updateGraph();
             reproduce();
             generation++;
