@@ -28,15 +28,42 @@ window.onload = function() {
     });
 
     // Functions
-    function createFish(toxic){
-        return { x: Math.random()*700, y: Math.random()*400,
-                 vx:(Math.random()-0.5)*2, vy:(Math.random()-0.5)*2,
-                 toxic:toxic, alive:true };
+    function moveFish(f){
+    f.x += f.vx;
+    f.y += f.vy;
+
+    // Bounce off walls
+    if(f.x < 5){ f.x = 5; f.vx *= -1; }
+    if(f.x > 695){ f.x = 695; f.vx *= -1; }
+    if(f.y < 5){ f.y = 5; f.vy *= -1; }
+    if(f.y > 395){ f.y = 395; f.vy *= -1; }
+}
+
+function movePredator(p){
+    let target = null, minDist = Infinity;
+    fish.forEach(f=>{
+        if(!f.alive) return;
+        if(f.toxic) return; // predators avoid toxic
+        let dx = f.x - p.x, dy = f.y - p.y, dist = Math.sqrt(dx*dx + dy*dy);
+        if(dist < minDist){ minDist = dist; target = f; }
+    });
+
+    if(target){
+        let dx = target.x - p.x, dy = target.y - p.y, dist = Math.sqrt(dx*dx + dy*dy);
+        // Move toward target
+        p.x += dx/dist * p.speed;
+        p.y += dy/dist * p.speed;
+
+        // Eat target if close
+        if(dist < 10) target.alive = false;
     }
 
-    function createPredator(){
-        return { x: Math.random()*700, y: Math.random()*400, speed:1.5 };
-    }
+    // Keep predator inside canvas
+    if(p.x < 10) p.x = 10;
+    if(p.x > 690) p.x = 690;
+    if(p.y < 10) p.y = 10;
+    if(p.y > 390) p.y = 390;
+}
 
     function init(){
         fish = []; predators = [];
