@@ -17,7 +17,7 @@ window.onload = function() {
         data: {
             labels: [],
             datasets: [{
-                label: "% Toxic",
+                label: "% of Toxic Fish",
                 data: [],
                 borderWidth: 2,
                 borderColor: "red",
