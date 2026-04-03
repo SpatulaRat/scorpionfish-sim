@@ -27,7 +27,28 @@ window.onload = function() {
         options: { scales: { y: { min:0, max:1 } } }
     });
 
+    
     // Functions
+
+    function createFish(isToxic) {
+        return {
+            x: Math.random() * 700,
+            y: Math.random() * 400,
+            vx: (Math.random() - 0.5) * 2,
+            vy: (Math.random() - 0.5) * 2,
+            toxic: isToxic,
+            alive: true
+        };
+    }
+    
+    function createPredator() {
+        return {
+            x: Math.random() * 700,
+            y: Math.random() * 400,
+            speed: 2
+        };
+    }
+    
     function moveFish(f){
     f.x += f.vx;
     f.y += f.vy;
