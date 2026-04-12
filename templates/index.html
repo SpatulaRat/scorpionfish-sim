@@ -180,7 +180,7 @@
 
     alive.forEach(f => {
       // toxic fish reproduce less (cost)
-      const babies = f.toxic ? 1 : 2;
+      const babies = f.toxic ? 2 : 2;
 
       for (let i = 0; i < babies; i++) {
         newFish.push(createFish(
